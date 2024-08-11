@@ -1,0 +1,38 @@
+<div>
+  <div>
+    <h1>
+      Text Selection
+    </h1>
+  </div>
+</div>
+
+<hr>
+
+
+<div>
+
+<% if current_user != nil %>
+
+    <form action="/text" method="post">
+      <div>
+        <label for="phone_number">Phone #</label>
+        <input type="tel" id="phone_number" name="phone_number" placeholder="+1 123-456-7890" required>
+      </div>
+
+      <button type="submit">Send Text</button>
+    </form>
+
+  <% else %>
+    <p>You must <a href="/users/sign_in">sign in</a> to set-up a text.</p>
+  <% end %>
+  </div>
+</div>
+
+<hr>
+
+<div>
+  <% if current_user != nil %>
+    <%= render({ :template => "home/example_text"}) %>
+  <% else %>
+  <% end %>
+</div>
