@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  require 'twilio-ruby'
+  require "http"
   #test
 
   def index
@@ -8,15 +8,23 @@ class HomeController < ApplicationController
 
   def text
     phone_number = params.fetch("phone_number")
+    @user_number = phone_number
 
-    if valid_phone_number?(phone_number)
-      if send_text_message(phone_number)
-        redirect_to("/", notice: "Text successfully sent.")
+    if phone_number.present? && valid_phone_number?(phone_number)
+      # Render the content of the ERB file to a string
+      message_body = render_to_string(template: "home/message", layout: false)
+      @user_text = message_body
+  
+      if send_text_message(phone_number, message_body)
+        flash[:notice] = "Text successfully sent."
+        redirect_to("/") 
       else
-        redirect_to("/", alert: "Failed to send text message. Please try again!")
+        flash[:alert] = "Failed to send text message. Please try again!"
+        redirect_to("/")  
       end
     else
-      redirect_to("/", alert: "Phone number not valid. Please try again!")
+      flash[:alert] = "Phone number not valid. Please try again!"
+      redirect_to("/") 
     end
   end
 
@@ -27,24 +35,21 @@ class HomeController < ApplicationController
     phone_number.match?(/\A\+\d{1,3}\d{10}\z/)
   end
 
-  def send_text_message(to)
+
+  def send_text_message(to, message_body)
     begin
-      client = Twilio::REST::Client.new(
-        '',
-        ''
-      )
-
-      message = client.messages.create(
-        from: "+", # 
-        to: "+", # Use the method parameter 'to' correctly
-        body: "Hello! This is a test message from your Rails app."
-      )
-
-      Rails.logger.info("Message sent: #{message.sid}")
-      return true
-    rescue Twilio::REST::RestError => e
-      Rails.logger.error("Twilio error: #{e.message}")
-      return false
+      plan_id = "REDACTED"
+      api_token = "REDACTED"
+    
+      url = "https://sms.api.sinch.com/xms/v1/REDACTED PLAN ID/batches"
+      json_request_data = {
+        "from": "REDACTED",
+        "to": ["#{@user_number}"],
+        "body": "#{@user_text}"
+      }
+      client = HTTP.auth("Bearer REDACTED API TOKEN").headers(:accept => "application/json")
+  
+      response = client.post(url, :json => json_request_data)
     end
   end
 end
