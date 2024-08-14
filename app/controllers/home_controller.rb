@@ -43,7 +43,7 @@ class HomeController < ApplicationController
     
       url = "https://sms.api.sinch.com/xms/v1/REDACTED PLAN ID/batches"
       json_request_data = {
-        "from": "REDACTED",
+        "from": "REDACTED #",
         "to": ["#{@user_number}"],
         "body": "#{@user_text}"
       }
